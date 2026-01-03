@@ -8,15 +8,12 @@ export function HeroSection() {
     return (
         <section className="relative h-screen w-full flex items-end justify-center overflow-hidden pb-24 md:pb-32 bg-black">
             {/* Background Logo */}
-            {/* Background Logo - Updated for Mobile Visibility */}
-            <div className="relative z-10 h-64 w-full md:absolute md:inset-0 md:h-auto md:z-0">
+            <div className="absolute inset-0 z-0">
                 <Image
                     src="/logo.png"
                     alt="Background Logo"
                     fill
-                    // Mobile: Contain (nicht schneiden), 100% Sichtbar
-                    // Desktop: Cover (füllend), 30% Sichtbar
-                    className="object-contain opacity-100 md:object-cover md:opacity-30"
+                    className="object-cover object-center opacity-20 md:opacity-30"
                     priority
                 />
             </div>
