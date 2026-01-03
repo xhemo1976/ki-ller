@@ -23,18 +23,24 @@ function useMobile() {
 function NeuralNetwork({ isMobile }: { isMobile: boolean }) {
     const ref = useRef<THREE.Points>(null!);
 
-    // Reduce count on mobile (2500 vs 5000)
-    const count = isMobile ? 2500 : 5000;
+    // "Starry Sky" density on mobile (3500), dense core on desktop (5000)
+    const count = isMobile ? 3500 : 5000;
+    const radius = isMobile ? 9 : 1.5;
 
     // We use useMemo with key dependency on isMobile to recreate buffer only when needed
     const positions = useMemo(() => {
-        return random.inSphere(new Float32Array(count * 3), { radius: 1.5 }) as Float32Array;
-    }, [count]);
+        return random.inSphere(new Float32Array(count * 3), { radius }) as Float32Array;
+    }, [count, radius]);
 
     useFrame((state, delta) => {
         if (!ref.current) return;
-        ref.current.rotation.x -= delta / 10;
-        ref.current.rotation.y -= delta / 15;
+
+        // Slower, majestic rotation on mobile
+        const rotSpeedX = isMobile ? 20 : 10;
+        const rotSpeedY = isMobile ? 30 : 15;
+
+        ref.current.rotation.x -= delta / rotSpeedX;
+        ref.current.rotation.y -= delta / rotSpeedY;
 
         const time = state.clock.getElapsedTime();
         const scale = 1 + Math.sin(time * 2) * 0.05;
@@ -46,7 +52,7 @@ function NeuralNetwork({ isMobile }: { isMobile: boolean }) {
             <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
                 <PointMaterial
                     transparent
-                    color="#39ff14"
+                    color="#00C2FF" // Neon Blue (Cyberpunk)
                     size={0.005}
                     sizeAttenuation={true}
                     depthWrite={false}
@@ -59,12 +65,13 @@ function NeuralNetwork({ isMobile }: { isMobile: boolean }) {
 
 function ConnectingLines({ isMobile }: { isMobile: boolean }) {
     // Reduce count on mobile (25 vs 50)
-    const count = isMobile ? 25 : 50;
+    const count = isMobile ? 20 : 50;
+    const radius = isMobile ? 12 : 2;
 
     const points = useMemo(() => {
         const pCount = isMobile ? 500 : 1000;
-        return random.inSphere(new Float32Array(pCount * 3), { radius: 2 }) as Float32Array;
-    }, [isMobile]);
+        return random.inSphere(new Float32Array(pCount * 3), { radius }) as Float32Array;
+    }, [isMobile, radius]);
 
     return (
         <group>
@@ -86,18 +93,14 @@ function SceneEvents({ mouse, isMobile }: { mouse: React.MutableRefObject<[numbe
     useFrame((state) => {
         const { viewport, camera } = state;
 
-        // Camera Zoom Logic
-        // Mobile: Zoom out to ~18 to keep particles generated at origin visible but small/background
-        // Desktop: Zoom in at ~3
-        // We lerp current position to targetZ
-        const targetZ = isMobile ? 18 : 3;
+        // Deep Space Camera for Mobile ("Starry Sky" feeling)
+        const targetZ = isMobile ? 28 : 3;
 
         // Smooth transition for Z
         camera.position.z += (targetZ - camera.position.z) * 0.05;
 
-        // Mouse Parallax (Verify subtle vs extreme, user wanted extreme but maybe less on mobile?)
-        // Keeping it consistent but maybe less amplitude on mobile could be good.
-        const parallaxAmp = isMobile ? 0.02 : 0.05;
+        // Mouse Parallax
+        const parallaxAmp = isMobile ? 0.01 : 0.05;
 
         state.camera.lookAt(0, 0, 0);
         state.camera.position.x += (state.pointer.x - state.camera.position.x) * parallaxAmp;
