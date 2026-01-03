@@ -112,6 +112,7 @@ function SceneEvents({ mouse, isMobile }: { mouse: React.MutableRefObject<[numbe
 export function NeuralCore() {
     const mouse = useRef<[number, number]>([0, 0]);
     const isMobile = useMobile();
+    if (isMobile) return null;
 
     return (
         <div className="absolute inset-0 w-full h-full z-0">
