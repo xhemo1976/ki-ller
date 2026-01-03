@@ -10,7 +10,7 @@ import { BlendFunction } from "postprocessing";
 
 function NeuralNetwork(props: any) {
     const ref = useRef<THREE.Points>(null!);
-    const [sphere] = useState(() => random.inSphere(new Float32Array(5000 * 3), { radius: 1.5 }));
+    const [sphere] = useState(() => random.inSphere(new Float32Array(5000 * 3), { radius: 1.5 }) as Float32Array);
 
     // Custom definitions for the "Neural Core" logic
     // Implementing a custom shader material logic via standard PointsMaterial for simplicity first, 
@@ -64,7 +64,7 @@ function ConnectingLines() {
         <group>
             {/* Abstract representation, could be improved with 'Line' from drei but creating custom instanced mesh is better for perf. 
                  For now, keeping it subtle with just more points in a different color (Cyan) */}
-            <Points positions={random.inSphere(new Float32Array(1000 * 3), { radius: 2 })} stride={3}>
+            <Points positions={random.inSphere(new Float32Array(1000 * 3), { radius: 2 }) as Float32Array} stride={3}>
                 <PointMaterial
                     transparent
                     color="#00ffff" // Electric Cyan
