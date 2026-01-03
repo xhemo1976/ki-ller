@@ -13,12 +13,15 @@ export function HeroSection() {
                     src="/logo.png"
                     alt="Background Logo"
                     fill
-                    className="object-cover opacity-30"
+                    className="object-cover object-center opacity-20 md:opacity-30"
                     priority
                 />
             </div>
 
             <NeuralCore />
+
+            {/* Mobile Gradient Vignette for Text Readability */}
+            <div className="absolute inset-0 z-5 bg-gradient-to-t from-black via-black/50 to-transparent md:hidden pointer-events-none" />
 
             {/* Content Overlay */}
             <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">

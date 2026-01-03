@@ -1,41 +1,52 @@
 "use client";
 
-import { useRef, useMemo, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useMemo, useState, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Points, PointMaterial, Float, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, ChromaticAberration, Noise } from "@react-three/postprocessing";
 import * as random from "maath/random";
 import * as THREE from "three";
 import { BlendFunction } from "postprocessing";
 
-function NeuralNetwork(props: any) {
-    const ref = useRef<THREE.Points>(null!);
-    const [sphere] = useState(() => random.inSphere(new Float32Array(5000 * 3), { radius: 1.5 }) as Float32Array);
+// Utility hook for mobile detection
+function useMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+    return isMobile;
+}
 
-    // Custom definitions for the "Neural Core" logic
-    // Implementing a custom shader material logic via standard PointsMaterial for simplicity first, 
-    // but using frame loop to manipulate positions for the "Magnet" effect.
+function NeuralNetwork({ isMobile }: { isMobile: boolean }) {
+    const ref = useRef<THREE.Points>(null!);
+
+    // Reduce count on mobile (2500 vs 5000)
+    const count = isMobile ? 2500 : 5000;
+
+    // We use useMemo with key dependency on isMobile to recreate buffer only when needed
+    const positions = useMemo(() => {
+        return random.inSphere(new Float32Array(count * 3), { radius: 1.5 }) as Float32Array;
+    }, [count]);
 
     useFrame((state, delta) => {
         if (!ref.current) return;
-
-        // Rotation
         ref.current.rotation.x -= delta / 10;
         ref.current.rotation.y -= delta / 15;
 
-        // Mouse Interaction (Magnet Field)
         const time = state.clock.getElapsedTime();
-        // Simple pulse effect based on time
         const scale = 1 + Math.sin(time * 2) * 0.05;
         ref.current.scale.set(scale, scale, scale);
     });
 
     return (
         <group rotation={[0, 0, Math.PI / 4]}>
-            <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
+            <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
                 <PointMaterial
                     transparent
-                    color="#39ff14" // Neon Green base
+                    color="#39ff14"
                     size={0.005}
                     sizeAttenuation={true}
                     depthWrite={false}
@@ -46,28 +57,21 @@ function NeuralNetwork(props: any) {
     );
 }
 
-function ConnectingLines() {
-    // A secondary layer of lines/structure to simulate connections
-    const count = 50;
-    const lines = useMemo(() => {
-        const temp = [];
-        for (let i = 0; i < count; i++) {
-            const x = (Math.random() - 0.5) * 4;
-            const y = (Math.random() - 0.5) * 4;
-            const z = (Math.random() - 0.5) * 4;
-            temp.push([x, y, z]);
-        }
-        return temp;
-    }, []);
+function ConnectingLines({ isMobile }: { isMobile: boolean }) {
+    // Reduce count on mobile (25 vs 50)
+    const count = isMobile ? 25 : 50;
+
+    const points = useMemo(() => {
+        const pCount = isMobile ? 500 : 1000;
+        return random.inSphere(new Float32Array(pCount * 3), { radius: 2 }) as Float32Array;
+    }, [isMobile]);
 
     return (
         <group>
-            {/* Abstract representation, could be improved with 'Line' from drei but creating custom instanced mesh is better for perf. 
-                 For now, keeping it subtle with just more points in a different color (Cyan) */}
-            <Points positions={random.inSphere(new Float32Array(1000 * 3), { radius: 2 }) as Float32Array} stride={3}>
+            <Points positions={points} stride={3}>
                 <PointMaterial
                     transparent
-                    color="#00ffff" // Electric Cyan
+                    color="#00ffff"
                     size={0.003}
                     sizeAttenuation={true}
                     depthWrite={false}
@@ -78,42 +82,49 @@ function ConnectingLines() {
     )
 }
 
-function SceneEvents({ mouse }: { mouse: React.MutableRefObject<[number, number]> }) {
+function SceneEvents({ mouse, isMobile }: { mouse: React.MutableRefObject<[number, number]>, isMobile: boolean }) {
     useFrame((state) => {
-        // Convert mouse screen coords to 3D world influence if needed
-        const { viewport } = state;
-        // Logic to distort particles would go here using a custom shader prop update
-        // Since we are using standard materials for MVP stability, we handle rotation/group movement here.
+        const { viewport, camera } = state;
 
-        const x = (state.pointer.x * viewport.width) / 2;
-        const y = (state.pointer.y * viewport.height) / 2;
+        // Camera Zoom Logic
+        // Mobile: Zoom out to ~18 to keep particles generated at origin visible but small/background
+        // Desktop: Zoom in at ~3
+        // We lerp current position to targetZ
+        const targetZ = isMobile ? 18 : 3;
+
+        // Smooth transition for Z
+        camera.position.z += (targetZ - camera.position.z) * 0.05;
+
+        // Mouse Parallax (Verify subtle vs extreme, user wanted extreme but maybe less on mobile?)
+        // Keeping it consistent but maybe less amplitude on mobile could be good.
+        const parallaxAmp = isMobile ? 0.02 : 0.05;
 
         state.camera.lookAt(0, 0, 0);
-        state.camera.position.x += (state.pointer.x - state.camera.position.x) * 0.05
-        state.camera.position.y += (-state.pointer.y - state.camera.position.y) * 0.05
+        state.camera.position.x += (state.pointer.x - state.camera.position.x) * parallaxAmp;
+        state.camera.position.y += (-state.pointer.y - state.camera.position.y) * parallaxAmp;
     })
     return null;
 }
 
 export function NeuralCore() {
     const mouse = useRef<[number, number]>([0, 0]);
+    const isMobile = useMobile();
 
     return (
         <div className="absolute inset-0 w-full h-full z-0">
-            <Canvas camera={{ position: [0, 0, 3] }} gl={{ alpha: true }} onMouseMove={(e) => (mouse.current = [e.clientX, e.clientY])}>
-
-                {/* Fog removed to see background image clearly */}
-                {/* <fog attach="fog" args={['#000000', 1, 10]} /> */}
+            {/* Initial camera pos can be neutral, SceneEvents will adjust it */}
+            <Canvas camera={{ position: [0, 0, 10] }} gl={{ alpha: true }} onMouseMove={(e) => (mouse.current = [e.clientX, e.clientY])}>
 
                 <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-                    <NeuralNetwork />
+                    <NeuralNetwork isMobile={isMobile} />
                 </Float>
 
                 <Float speed={1} rotationIntensity={0.5} floatIntensity={1}>
-                    <ConnectingLines />
+                    <ConnectingLines isMobile={isMobile} />
                 </Float>
 
-                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                {/* Fewer stars on mobile if needed, but negligible perf cost usually */}
+                <Stars radius={100} depth={50} count={isMobile ? 2000 : 5000} factor={4} saturation={0} fade speed={1} />
 
                 <EffectComposer>
                     <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.5} radius={0.4} />
@@ -125,7 +136,7 @@ export function NeuralCore() {
                 </EffectComposer>
 
                 {/* Interactive Camera rig */}
-                <SceneEvents mouse={mouse} />
+                <SceneEvents mouse={mouse} isMobile={isMobile} />
             </Canvas>
         </div>
     );
