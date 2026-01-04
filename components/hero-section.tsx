@@ -26,27 +26,6 @@ export function HeroSection() {
 
             {/* Content Overlay */}
             <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
-                {/* Mobile Logo - Inside Text Container */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: "circOut" }}
-                    className="w-full mb-6 md:hidden"
-                >
-                    <Image
-                        src="/logo.png"
-                        alt="KI-LLER.AI Logo"
-                        width={800}
-                        height={400}
-                        className="w-full h-auto object-contain"
-                        style={{
-                            maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
-                            WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)"
-                        }}
-                        priority
-                    />
-                </motion.div>
-
                 <motion.h1
                     initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
                     animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
