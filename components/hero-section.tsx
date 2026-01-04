@@ -7,24 +7,46 @@ import Image from "next/image";
 export function HeroSection() {
     return (
         <section className="relative h-screen w-full flex items-end justify-center overflow-hidden pb-24 md:pb-32 bg-black">
-            {/* Background Logo */}
+            {/* Background Eye - Full Screen Cover */}
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/logo.png"
-                    alt="Background Logo"
+                    alt="Background"
                     fill
-                    className="object-cover object-center opacity-20 md:opacity-30"
+                    className="object-cover object-center opacity-40 md:opacity-30"
                     priority
                 />
             </div>
 
+            {/* Particles */}
             <NeuralCore />
 
             {/* Mobile Gradient Vignette for Text Readability */}
-            <div className="absolute inset-0 z-5 bg-gradient-to-t from-black via-black/50 to-transparent md:hidden pointer-events-none" />
+            <div className="absolute inset-0 z-5 bg-gradient-to-t from-black via-black/60 to-black/30 md:hidden pointer-events-none" />
 
             {/* Content Overlay */}
             <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+                {/* Mobile Logo - Inside Text Container */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, ease: "circOut" }}
+                    className="w-full mb-6 md:hidden"
+                >
+                    <Image
+                        src="/logo.png"
+                        alt="KI-LLER.AI Logo"
+                        width={800}
+                        height={400}
+                        className="w-full h-auto object-contain"
+                        style={{
+                            maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+                            WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)"
+                        }}
+                        priority
+                    />
+                </motion.div>
+
                 <motion.h1
                     initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
                     animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}

@@ -1,0 +1,19 @@
+[33m8adaa52[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m background
+[33m2c072f8[m background
+[33m0cb8f76[m background
+[33m420335e[m Make mobile logo bigger
+[33m13363c7[m Make mobile logo bigger
+[33mc576081[m Make mobile logo bigger
+[33m91a374d[m Make mobile logo bigger
+[33m61413d8[m Make mobile logo bigger
+[33m5a82341[m Fix mobile logo layout: contain + mask
+[33ma69ae6d[m Increase mobile logo opacity for readability
+[33m46b1492[m Adjust mobile logo scale to push it back
+[33mb0a2b40[m Fix Mobile View
+[33m7f2af0a[m Fix Mobile View
+[33ma51fde7[m Fix Mobile View
+[33m322686c[m Refine Mobile 3D: Blue Starfield
+[33ma88269d[m Mobile optimizations for Hero and NeuralCore
+[33mb498d93[m Fix TypeScript build error in NeuralCore
+[33me6093ef[m Initial Upload
+[33m33368fc[m Initial commit from Create Next App
