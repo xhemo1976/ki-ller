@@ -13,7 +13,7 @@ export function HeroSection() {
                     src="/logo.png"
                     alt="Background"
                     fill
-                    className="object-cover object-center opacity-40 md:opacity-30 scale-90 md:scale-100"
+                    className="object-cover object-center opacity-40 md:opacity-40 scale100 md:scale-100"
                     priority
                 />
             </div>
@@ -40,8 +40,8 @@ export function HeroSection() {
                     transition={{ delay: 0.5, duration: 0.8 }}
                     className="text-xl md:text-2xl font-light tracking-tight text-tech-grey/80 max-w-2xl mx-auto"
                 >
-                    für dein Business. <br />
-                    Wir Automatisieren euern Altag.
+                    Für euer Business. <br />
+                    Wir Automatisieren eueren Alltag.
                 </motion.p>
             </div>
         </section>
