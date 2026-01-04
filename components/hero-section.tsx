@@ -13,7 +13,7 @@ export function HeroSection() {
                     src="/logo.png"
                     alt="Background"
                     fill
-                    className="object-cover object-center opacity-40 md:opacity-30"
+                    className="object-cover object-center opacity-40 md:opacity-30 scale-95 md:scale-100"
                     priority
                 />
             </div>
